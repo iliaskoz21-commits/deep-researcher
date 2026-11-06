@@ -1,0 +1,22 @@
+# Ignore virtual environments
+.venv/
+venv/
+env/
+
+# Ignore Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Ignore Git directory
+.git/
+.gitignore
+
+# Ignore environment variables containing real keys
+.env
+.env.local
+
+# Documentation and temporary files
+*.md
+!README.md

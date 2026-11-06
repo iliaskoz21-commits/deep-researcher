@@ -11,3 +11,8 @@ beautifulsoup4>=4.13.0
 
 # Environment variables management
 python-dotenv>=1.0.0
+
+# Testing suite
+pytest>=9.0.0
+pytest-asyncio>=1.4.0
+httpx>=0.28.0

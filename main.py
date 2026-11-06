@@ -1,15 +1,18 @@
 """
 main.py - FastAPI Backend Service for the Autonomous Research Agent.
 
-Exposes REST API endpoints allowing web frontends, mobile applications,
-or external microservices to trigger autonomous research runs.
+Exposes REST API endpoints and serves an interactive web dashboard
+allowing users or external services to trigger autonomous research workflows.
 """
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import uvicorn
 import uuid
+import os
 
 # Import the core agent execution workflow
 from agent import execute_research
@@ -17,8 +20,8 @@ from agent import execute_research
 # Initialize FastAPI application
 app = FastAPI(
     title="DeepResearcher ADK API",
-    description="Production-ready REST API powered by Google ADK and Gemini Flash for autonomous web research.",
-    version="1.0.0"
+    description="Production-ready REST API & Web UI powered by Google ADK and Gemini Flash for autonomous web research.",
+    version="1.1.0"
 )
 
 # Configure Cross-Origin Resource Sharing (CORS)
@@ -29,6 +32,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files directory if it exists
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
 
 # Pydantic schema for request body
@@ -53,13 +61,27 @@ class ResearchResponse(BaseModel):
 
 
 @app.get("/")
+def serve_dashboard():
+    """Serves the interactive web interface dashboard."""
+    index_file = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {
+        "status": "online",
+        "service": "DeepResearcher ADK API",
+        "model": "Gemini Flash (via Google ADK)",
+        "docs_url": "/docs"
+    }
+
+
+@app.get("/api/health")
 def health_check():
     """Health check endpoint providing service status and metadata."""
     return {
         "status": "online",
         "service": "DeepResearcher ADK API",
         "model": "Gemini Flash (via Google ADK)",
-        "docs_url": "/docs"
+        "version": "1.1.0"
     }
 
 

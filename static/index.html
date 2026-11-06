@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepResearcher ADK | Autonomous AI Agent</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Marked.js for rendering markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    /* Custom Markdown Output Styling */
+    .markdown-body h1 { font-size: 1.75rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #1e293b; }
+    .markdown-body h2 { font-size: 1.35rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #334155; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.25rem; }
+    .markdown-body h3 { font-size: 1.15rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #475569; }
+    .markdown-body p { margin-bottom: 0.85rem; line-height: 1.65; color: #334155; }
+    .markdown-body ul, .markdown-body ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-type: disc; }
+    .markdown-body li { margin-bottom: 0.35rem; color: #334155; }
+    .markdown-body a { color: #2563eb; text-decoration: underline; }
+    .markdown-body code { background-color: #f1f5f9; padding: 0.15rem 0.35rem; border-radius: 0.25rem; font-family: monospace; font-size: 0.9em; }
+    .markdown-body pre { background-color: #0f172a; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-bottom: 1rem; }
+    .markdown-body blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; color: #64748b; font-style: italic; margin-bottom: 1rem; }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 flex flex-col font-sans">
+
+  <!-- Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold text-lg shadow-md">
+          DR
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-slate-900 leading-tight">DeepResearcher ADK</h1>
+          <p class="text-xs text-slate-500">Autonomous Agent with Google ADK & Gemini Flash</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <a href="/docs" target="_blank" class="text-xs font-medium text-slate-600 hover:text-blue-600 bg-slate-100 px-3 py-1.5 rounded-md transition">
+          Swagger API Docs ↗
+        </a>
+        <a href="https://github.com/iliaskoz21-commits/deep-researcher" target="_blank" class="text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 px-3 py-1.5 rounded-md shadow-sm transition">
+          GitHub Repo
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full">
+
+    <!-- Research Query Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
+      <h2 class="text-xl font-bold text-slate-900 mb-2">Start an Autonomous Research</h2>
+      <p class="text-sm text-slate-500 mb-5">
+        Provide a research topic. The Google ADK agent will autonomously search the live web, scrape relevant articles, analyze data, and synthesize a comprehensive report.
+      </p>
+
+      <form id="researchForm" class="space-y-4">
+        <div>
+          <label for="topicInput" class="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
+            Research Subject / Query
+          </label>
+          <textarea
+            id="topicInput"
+            rows="3"
+            placeholder="e.g. State of AI in High School Education 2026: pedagogical impacts and integration challenges"
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition text-sm resize-none shadow-sm"
+            required
+          ></textarea>
+        </div>
+
+        <!-- Suggestion Chips -->
+        <div>
+          <span class="text-xs text-slate-500 font-medium">Quick Suggestions:</span>
+          <div class="flex flex-wrap gap-2 mt-1.5">
+            <button type="button" class="suggestion-chip text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 px-3 py-1 rounded-full border border-slate-200 transition">
+              AI Tools for Computer Science Educators 2026
+            </button>
+            <button type="button" class="suggestion-chip text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 px-3 py-1 rounded-full border border-slate-200 transition">
+              Google ADK vs LangGraph for Production Agents
+            </button>
+            <button type="button" class="suggestion-chip text-xs bg-slate-100 hover:bg-blue-50 hover:text-blue-600 text-slate-700 px-3 py-1 rounded-full border border-slate-200 transition">
+              Quantum Computing Breakthroughs in 2026
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end">
+          <button
+            type="submit"
+            id="submitBtn"
+            class="inline-flex items-center space-x-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-sm hover:shadow transition transform active:scale-95 text-sm"
+          >
+            <span>Run Research Agent</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Loading State Indicator -->
+    <div id="loadingState" class="hidden bg-white rounded-2xl shadow-sm border border-blue-100 p-8 mb-8 text-center">
+      <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-blue-600 border-t-transparent mb-4"></div>
+      <h3 class="text-base font-semibold text-slate-900 mb-1">Agent is Conducting Research...</h3>
+      <p id="loadingStatusText" class="text-xs text-slate-500 animate-pulse">
+        Querying DuckDuckGo, fetching web content, and structuring citations...
+      </p>
+    </div>
+
+    <!-- Error Alert Box -->
+    <div id="errorAlert" class="hidden bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl mb-8 text-sm flex items-start space-x-3">
+      <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <div>
+        <span class="font-semibold">Error:</span>
+        <span id="errorMessage" class="ml-1"></span>
+      </div>
+    </div>
+
+    <!-- Research Results Display -->
+    <div id="resultsCard" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+      <div class="bg-slate-50 px-6 py-3.5 border-b border-slate-200 flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center space-x-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span class="text-xs font-semibold uppercase tracking-wider text-slate-700">Synthesized Report</span>
+          <span id="sessionBadge" class="text-[10px] bg-slate-200 text-slate-600 px-2 py-0.5 rounded font-mono"></span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button id="copyBtn" class="text-xs text-slate-600 hover:text-blue-600 bg-white border border-slate-200 px-3 py-1 rounded-md shadow-2xs hover:bg-slate-50 transition">
+            Copy Markdown
+          </button>
+        </div>
+      </div>
+      <div id="reportContainer" class="p-8 markdown-body">
+        <!-- Rendered Markdown will appear here -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    Built with <span class="text-slate-800 font-semibold">Google ADK</span>, <span class="text-slate-800 font-semibold">Gemini Flash</span>, and <span class="text-slate-800 font-semibold">FastAPI</span>.
+  </footer>
+
+  <!-- Frontend Logic -->
+  <script>
+    const form = document.getElementById('researchForm');
+    const topicInput = document.getElementById('topicInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingState = document.getElementById('loadingState');
+    const resultsCard = document.getElementById('resultsCard');
+    const reportContainer = document.getElementById('reportContainer');
+    const sessionBadge = document.getElementById('sessionBadge');
+    const copyBtn = document.getElementById('copyBtn');
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Quick suggestion chip listener
+    document.querySelectorAll('.suggestion-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        topicInput.value = chip.innerText.trim();
+        topicInput.focus();
+      });
+    });
+
+    let rawMarkdownContent = "";
+
+    // Form Submission Handler
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const topic = topicInput.value.trim();
+      if (!topic) return;
+
+      // Reset and display loading
+      errorAlert.classList.add('hidden');
+      resultsCard.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      try {
+        const response = await fetch('/api/v1/research', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic: topic })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || 'Research request failed.');
+        }
+
+        rawMarkdownContent = data.report;
+        reportContainer.innerHTML = marked.parse(data.report);
+        sessionBadge.innerText = data.session_id;
+        resultsCard.classList.remove('hidden');
+
+        // Smooth scroll to results
+        resultsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      } catch (err) {
+        errorMessage.innerText = err.message;
+        errorAlert.classList.remove('hidden');
+      } finally {
+        loadingState.classList.add('hidden');
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    });
+
+    // Copy to Clipboard
+    copyBtn.addEventListener('click', async () => {
+      if (!rawMarkdownContent) return;
+      await navigator.clipboard.writeText(rawMarkdownContent);
+      const originalText = copyBtn.innerText;
+      copyBtn.innerText = "Copied!";
+      copyBtn.classList.add('text-emerald-600', 'font-semibold');
+      setTimeout(() => {
+        copyBtn.innerText = originalText;
+        copyBtn.classList.remove('text-emerald-600', 'font-semibold');
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
