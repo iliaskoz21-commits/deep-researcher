@@ -1,10 +1,28 @@
 # 🚀 DeepResearcher-ADK
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white" alt="Python 3.12" />
+  <img src="https://img.shields.io/badge/Framework-Flask_3.x-black?logo=flask&logoColor=white" alt="Flask" />
+  <img src="https://img.shields.io/badge/AI_Engine-Google_ADK-4285F4?logo=google&logoColor=white" alt="Google ADK" />
+  <img src="https://img.shields.io/badge/LLM-Gemini_Flash-8E75C2" alt="Gemini Flash" />
+  <img src="https://img.shields.io/badge/Tests-6%20Passed-success?logo=pytest&logoColor=white" alt="Pytest" />
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?logo=docker&logoColor=white" alt="Docker Ready" />
+  <img src="https://img.shields.io/badge/License-Apache_2.0-green.svg" alt="License" />
+</p>
+
 > **Autonomous Research Agent with Google Agent Development Kit (ADK), Gemini Flash & Flask Web Interface.**
 
 A clean, Pythonic AI microservice powered by the official **Google Agent Development Kit (ADK)** and **Gemini Flash**. The autonomous agent conducts deep web research, evaluates sources, scrapes relevant articles, and synthesizes comprehensive Markdown reports with citations.
 
 The user interface is built with **Flask** and **Jinja2 templates** — keeping the entire stack 100% Pythonic, without complex JavaScript frameworks.
+
+---
+
+## 🌐 Live Status
+
+- **GitHub Repository**: [https://github.com/iliaskoz21-commits/deep-researcher](https://github.com/iliaskoz21-commits/deep-researcher) (Public & Online)
+- **Local Web Interface**: `http://127.0.0.1:5000` (Served via Flask)
+- **Containerized Run**: Ready via Docker & Docker Compose
 
 ---
 
@@ -33,7 +51,7 @@ The user interface is built with **Flask** and **Jinja2 templates** — keeping 
 - **Google ADK Native**: Powered by Google's official `Agent`, `Runner`, and `InMemorySessionService`.
 - **Gemini Flash Engine**: High-speed reasoning, large context window, and minimal execution cost.
 - **Zero-Cost Web Grounding**: Live web search and scraping without requiring paid search API subscriptions.
-- **Automated Test Suite**: Unit and integration tests using `pytest` and Flask test client (`app.test_client()`).
+- **Automated Test Suite**: 6 unit and integration tests using `pytest` and Flask test client (`app.test_client()`).
 - **Production Containerization**: Ready-to-deploy `Dockerfile` and `docker-compose.yml`.
 
 ---
@@ -127,6 +145,18 @@ All 6 unit and integration test suites validate:
 - Health check route (`/api/health`)
 - Flask web form rendering and template output
 - JSON API endpoint (`/api/v1/research`)
+
+---
+
+## 📖 JSON REST API
+
+The service also exposes a programmatic endpoint for third-party integrations:
+
+```bash
+curl -X POST "http://127.0.0.1:5000/api/v1/research" \
+     -H "Content-Type: application/json" \
+     -d '{"topic": "Latest advancements in Agentic AI and Function Calling 2026"}'
+```
 
 ---
 
