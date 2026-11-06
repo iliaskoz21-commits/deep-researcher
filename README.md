@@ -1,10 +1,10 @@
 # 🚀 DeepResearcher-ADK
 
-> **Autonomous Research Microservice with Google Agent Development Kit (ADK), Gemini Flash, FastAPI & Interactive Web UI.**
+> **Autonomous Research Agent with Google Agent Development Kit (ADK), Gemini Flash & Flask Web Interface.**
 
-A production-ready AI microservice powered by the official **Google Agent Development Kit (ADK)** and **Gemini Flash**. The autonomous agent conducts deep web research, evaluates sources, scrapes relevant articles, and synthesizes comprehensive Markdown reports with citations.
+A clean, Pythonic AI microservice powered by the official **Google Agent Development Kit (ADK)** and **Gemini Flash**. The autonomous agent conducts deep web research, evaluates sources, scrapes relevant articles, and synthesizes comprehensive Markdown reports with citations.
 
-Includes an interactive **Web Dashboard UI**, a full **Automated Testing Suite (`pytest`)**, and **Docker containerization**.
+The user interface is built with **Flask** and **Jinja2 templates** — keeping the entire stack 100% Pythonic, without complex JavaScript frameworks.
 
 ---
 
@@ -12,8 +12,8 @@ Includes an interactive **Web Dashboard UI**, a full **Automated Testing Suite (
 
 ```
                  ┌──────────────────────────────────────────────────┐
-                 │          FastAPI Web Service (Port 8000)         │
-                 │   GET / (Dashboard UI)  |  POST /api/v1/research │
+                 │          Flask Web Application (Port 5000)       │
+                 │    GET, POST / (Jinja2) | POST /api/v1/research  │
                  └─────────────────────────┬────────────────────────┘
                                            │
                          ┌─────────────────▼───────────────┐
@@ -28,11 +28,12 @@ Includes an interactive **Web Dashboard UI**, a full **Automated Testing Suite (
 ```
 
 ### Key Highlights
-- **Interactive Web Dashboard**: Beautiful Tailwind CSS UI served directly at root `/` with live research triggers, markdown preview, and copy-to-clipboard functionality.
-- **Google ADK Native**: Built using Google's official `Agent`, `Runner`, and `InMemorySessionService` primitives.
+- **100% Pythonic Web UI**: Built with **Flask** and **Jinja2** templates (`templates/index.html`). No Node.js or JavaScript complexity.
+- **Server-Side Markdown Rendering**: Converts agent reports to clean HTML using Python's `markdown` library.
+- **Google ADK Native**: Powered by Google's official `Agent`, `Runner`, and `InMemorySessionService`.
 - **Gemini Flash Engine**: High-speed reasoning, large context window, and minimal execution cost.
-- **Zero-Cost Web Grounding**: Live search and scraping without requiring paid search API subscriptions.
-- **Automated Test Suite**: Comprehensive unit and integration tests using `pytest` and `fastapi.testclient`.
+- **Zero-Cost Web Grounding**: Live web search and scraping without requiring paid search API subscriptions.
+- **Automated Test Suite**: Unit and integration tests using `pytest` and Flask test client (`app.test_client()`).
 - **Production Containerization**: Ready-to-deploy `Dockerfile` and `docker-compose.yml`.
 
 ---
@@ -42,14 +43,14 @@ Includes an interactive **Web Dashboard UI**, a full **Automated Testing Suite (
 ```
 deep-researcher/
 │
-├── static/
-│   └── index.html        # Interactive Web Dashboard UI (Tailwind + Marked.js)
+├── templates/
+│   └── index.html        # Flask Jinja2 Web Template (Forms & Results)
 ├── tests/
 │   ├── test_tools.py     # Unit tests for web search and content scraper
-│   └── test_api.py       # Integration tests for FastAPI endpoints
+│   └── test_api.py       # Integration tests for Flask routes
 ├── tools.py              # Python functions registered as Gemini Function Tools
 ├── agent.py              # Google ADK Agent configuration, Prompts & Runner workflow
-├── main.py               # FastAPI REST API & static file server
+├── main.py               # Flask Web Application & REST API
 ├── requirements.txt      # Project dependencies
 ├── Dockerfile            # Container image specification (Python 3.12-slim)
 ├── docker-compose.yml    # One-command container orchestration
@@ -93,11 +94,11 @@ GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
 *(Get a free Gemini API key at [Google AI Studio](https://aistudio.google.com/)).*
 
-#### 3. Run the Server
+#### 3. Run the Flask Server
 ```bash
 python main.py
 ```
-Open **[http://127.0.0.1:8000](http://127.0.0.1:8000)** in your browser to access the Web Dashboard.
+Open **[http://127.0.0.1:5000](http://127.0.0.1:5000)** in your browser to access the Flask web interface.
 
 ---
 
@@ -108,7 +109,7 @@ You can build and spin up the complete containerized service in one command:
 ```bash
 docker compose up --build
 ```
-The application will be live at `http://localhost:8000`.
+The application will be live at `http://localhost:5000`.
 
 ---
 
@@ -121,25 +122,11 @@ pytest -v
 ```
 
 All 6 unit and integration test suites validate:
-- Tool structure and query handling
+- Tool structure and live query handling
 - HTML tag stripping and content cleaning
-- Health check and Web Dashboard routes
-- Request payload validation and error handling
-
----
-
-## 📖 API Documentation & Testing (Swagger)
-
-FastAPI automatically generates interactive Swagger documentation:
-👉 **[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)**
-
-### Example Request (cURL)
-
-```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/research" \
-     -H "Content-Type: application/json" \
-     -d '{"topic": "Latest advancements in Agentic AI and Function Calling 2026"}'
-```
+- Health check route (`/api/health`)
+- Flask web form rendering and template output
+- JSON API endpoint (`/api/v1/research`)
 
 ---
 

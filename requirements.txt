@@ -1,9 +1,9 @@
 # Google Official Agent Development Kit (Gemini Agents)
 google-adk>=2.13.0
 
-# Web API framework & ASGI server
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
+# Web framework & template engine
+flask>=3.0.0
+markdown>=3.6.0
 
 # Free Web Search & HTML Scraping Tool for Autonomous Research
 ddgs>=9.0.0
@@ -15,4 +15,3 @@ python-dotenv>=1.0.0
 # Testing suite
 pytest>=9.0.0
 pytest-asyncio>=1.4.0
-httpx>=0.28.0

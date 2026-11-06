@@ -1,113 +1,87 @@
 """
-main.py - FastAPI Backend Service for the Autonomous Research Agent.
+main.py - Flask Web Application for DeepResearcher.
 
-Exposes REST API endpoints and serves an interactive web dashboard
-allowing users or external services to trigger autonomous research workflows.
+Provides a clean Pythonic web interface using Jinja2 templates,
+and REST endpoints to run autonomous research workflows using Google ADK & Gemini Flash.
 """
 
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
-import uvicorn
-import uuid
+from flask import Flask, render_template, request, jsonify
+import markdown
+import asyncio
 import os
-
-# Import the core agent execution workflow
 from agent import execute_research
 
-# Initialize FastAPI application
-app = FastAPI(
-    title="DeepResearcher ADK API",
-    description="Production-ready REST API & Web UI powered by Google ADK and Gemini Flash for autonomous web research.",
-    version="1.1.0"
-)
-
-# Configure Cross-Origin Resource Sharing (CORS)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Mount static files directory if it exists
-static_dir = os.path.join(os.path.dirname(__file__), "static")
-if os.path.exists(static_dir):
-    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+# Initialize Flask application
+app = Flask(__name__)
 
 
-# Pydantic schema for request body
-class ResearchRequest(BaseModel):
-    topic: str = Field(
-        ...,
-        description="The subject or topic to be researched.",
-        examples=["Emerging trends in AI for Education 2026"]
-    )
-    session_id: str | None = Field(
-        default=None,
-        description="Optional session identifier for conversation continuity."
-    )
+@app.route("/", methods=["GET", "POST"])
+def index():
+    """
+    Main web interface route.
+    Handles GET to display the form and POST to execute the research agent.
+    """
+    topic = ""
+    report_html = None
+    error = None
+
+    if request.method == "POST":
+        topic = request.form.get("topic", "").strip()
+
+        if not topic:
+            error = "Please provide a research topic."
+        else:
+            try:
+                # Run the asynchronous ADK research agent
+                raw_report = asyncio.run(execute_research(topic=topic))
+
+                # Convert Markdown to HTML server-side
+                report_html = markdown.markdown(
+                    raw_report,
+                    extensions=["fenced_code", "tables"]
+                )
+            except Exception as e:
+                error = f"Agent execution failed: {str(e)}"
+
+    return render_template("index.html", topic=topic, report_html=report_html, error=error)
 
 
-# Pydantic schema for response body
-class ResearchResponse(BaseModel):
-    status: str
-    session_id: str
-    topic: str
-    report: str
-
-
-@app.get("/")
-def serve_dashboard():
-    """Serves the interactive web interface dashboard."""
-    index_file = os.path.join(static_dir, "index.html")
-    if os.path.exists(index_file):
-        return FileResponse(index_file)
-    return {
-        "status": "online",
-        "service": "DeepResearcher ADK API",
-        "model": "Gemini Flash (via Google ADK)",
-        "docs_url": "/docs"
-    }
-
-
-@app.get("/api/health")
+@app.route("/api/health", methods=["GET"])
 def health_check():
-    """Health check endpoint providing service status and metadata."""
-    return {
+    """Health check endpoint returning service status in JSON."""
+    return jsonify({
         "status": "online",
-        "service": "DeepResearcher ADK API",
-        "model": "Gemini Flash (via Google ADK)",
-        "version": "1.1.0"
-    }
+        "service": "DeepResearcher Flask Service",
+        "framework": "Flask 3.x",
+        "model": "Gemini Flash (via Google ADK)"
+    })
 
 
-@app.post("/api/v1/research", response_model=ResearchResponse)
-async def start_research(request: ResearchRequest):
+@app.route("/api/v1/research", methods=["POST"])
+def api_research():
     """
-    Triggers an autonomous research workflow:
-    The agent searches the web, fetches articles, and returns a synthesized report.
+    JSON REST API endpoint for external clients and programmatic requests.
     """
-    session_id = request.session_id or f"session_{uuid.uuid4().hex[:8]}"
+    data = request.get_json() or {}
+    topic = data.get("topic", "").strip()
+
+    if not topic:
+        return jsonify({"status": "error", "message": "Missing 'topic' field"}), 400
+
+    session_id = data.get("session_id", "default_session")
 
     try:
-        report = await execute_research(topic=request.topic, session_id=session_id)
-        return ResearchResponse(
-            status="success",
-            session_id=session_id,
-            topic=request.topic,
-            report=report
-        )
+        raw_report = asyncio.run(execute_research(topic=topic, session_id=session_id))
+        return jsonify({
+            "status": "success",
+            "topic": topic,
+            "session_id": session_id,
+            "report": raw_report
+        })
     except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"An error occurred during agent execution: {str(e)}"
-        )
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 if __name__ == "__main__":
-    # Start the Uvicorn ASGI server on port 8000
-    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+    # Run the Flask development server on port 5000
+    app.run(host="0.0.0.0", port=5000, debug=True)

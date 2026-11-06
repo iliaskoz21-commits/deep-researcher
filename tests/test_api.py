@@ -1,49 +1,57 @@
 """
-test_api.py - Integration and endpoint tests for FastAPI server.
+test_api.py - Unit and integration tests for Flask web app.
 """
 
+import pytest
 from unittest.mock import patch, AsyncMock
-from fastapi.testclient import TestClient
 from main import app
 
-client = TestClient(app)
+
+@pytest.fixture
+def client():
+    """Configures the Flask test client."""
+    app.config["TESTING"] = True
+    with app.test_client() as client:
+        yield client
 
 
-def test_health_check_endpoint():
-    """Verify the health check endpoint returns 200 OK and online status."""
+def test_health_check(client):
+    """Verify GET /api/health returns online JSON status."""
     response = client.get("/api/health")
     assert response.status_code == 200
-    data = response.json()
+    data = response.get_json()
     assert data["status"] == "online"
-    assert "service" in data
+    assert "Flask" in data["framework"]
 
 
-def test_dashboard_endpoint():
-    """Verify root path serves the web UI index.html."""
+def test_index_get(client):
+    """Verify GET / renders the Jinja2 HTML form."""
     response = client.get("/")
     assert response.status_code == 200
-    assert "DeepResearcher ADK" in response.text
+    assert b"DeepResearcher" in response.data
+    assert b"<form" in response.data
 
 
-def test_research_endpoint_success():
-    """Verify POST /api/v1/research invokes agent and returns structured response."""
-    mock_report = "# Research Report\n\nKey findings on AI agents."
+def test_index_post_success(client):
+    """Verify POST / triggers research and renders markdown result."""
+    sample_report = "## Key Findings\n\n- AI enhances personalized learning."
 
     with patch("main.execute_research", new_callable=AsyncMock) as mock_exec:
-        mock_exec.return_value = mock_report
+        mock_exec.return_value = sample_report
 
-        payload = {"topic": "AI in Education 2026", "session_id": "test_session_42"}
-        response = client.post("/api/v1/research", json=payload)
-
+        response = client.post("/", data={"topic": "AI in High School"})
         assert response.status_code == 200
-        data = response.json()
+        assert b"Synthesized Research Report" in response.data
+        assert b"AI enhances personalized learning" in response.data
+
+
+def test_api_v1_research_endpoint(client):
+    """Verify POST /api/v1/research returns JSON for external callers."""
+    with patch("main.execute_research", new_callable=AsyncMock) as mock_exec:
+        mock_exec.return_value = "Detailed agent findings"
+
+        response = client.post("/api/v1/research", json={"topic": "Google ADK Agents"})
+        assert response.status_code == 200
+        data = response.get_json()
         assert data["status"] == "success"
-        assert data["session_id"] == "test_session_42"
-        assert data["report"] == mock_report
-        mock_exec.assert_awaited_once_with(topic="AI in Education 2026", session_id="test_session_42")
-
-
-def test_research_endpoint_validation_error():
-    """Verify endpoint rejects invalid payloads missing required topic field."""
-    response = client.post("/api/v1/research", json={})
-    assert response.status_code == 422  # Unprocessable Entity
+        assert data["report"] == "Detailed agent findings"

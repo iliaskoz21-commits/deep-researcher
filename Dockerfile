@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1
 # Set container working directory
 WORKDIR /app
 
-# Install system dependencies if required for network and certificates
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
@@ -23,8 +23,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application source code
 COPY . .
 
-# Expose FastAPI application port
-EXPOSE 8000
+# Expose Flask application port
+EXPOSE 5000
 
-# Run FastAPI server using Uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run Flask application
+CMD ["python", "main.py"]
